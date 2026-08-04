@@ -17,7 +17,7 @@
     --accent-ink: #14181C;
     --flag-energy: #C8102E;
     --flag-telecom: #E06B22;
-    --flag-water: #0072B5;
+    --flag-waste: #0E8F7C;
     --flag-other: #8A8E92;
     --flag-none: #B7BBBE;
     --tier-strong: #1E7A3D;
@@ -32,7 +32,7 @@
       --page: #101316; --surface: #171B1F; --surface-2: #1F2429; --ink: #F2F3F1; --ink-2: #C7CBCE;
       --muted: #8B9096; --hairline: #2B3136; --ring: rgba(242,243,241,0.10);
       --accent: #E8B93A; --accent-ink: #14120F;
-      --flag-energy: #E23768; --flag-telecom: #C97320; --flag-water: #3993D6; --flag-other: #7A7F84; --flag-none: #4A4F54;
+      --flag-energy: #E23768; --flag-telecom: #C97320; --flag-waste: #1CA88F; --flag-other: #7A7F84; --flag-none: #4A4F54;
       --tier-strong: #3FA562; --tier-fit: #4C86D6; --tier-marginal: #B8873A; --tier-pass: #6B7076;
       --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 14px 34px -16px rgba(0,0,0,0.6);
       color-scheme: dark;
@@ -42,7 +42,7 @@
     --page: #101316; --surface: #171B1F; --surface-2: #1F2429; --ink: #F2F3F1; --ink-2: #C7CBCE;
     --muted: #8B9096; --hairline: #2B3136; --ring: rgba(242,243,241,0.10);
     --accent: #E8B93A; --accent-ink: #14120F;
-    --flag-energy: #E23768; --flag-telecom: #C97320; --flag-water: #3993D6; --flag-other: #7A7F84; --flag-none: #4A4F54;
+    --flag-energy: #E23768; --flag-telecom: #C97320; --flag-waste: #1CA88F; --flag-other: #7A7F84; --flag-none: #4A4F54;
     --tier-strong: #3FA562; --tier-fit: #4C86D6; --tier-marginal: #B8873A; --tier-pass: #6B7076;
     --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 14px 34px -16px rgba(0,0,0,0.6);
     color-scheme: dark;
@@ -51,7 +51,7 @@
     --page: #FFFFFF; --surface: #FFFFFF; --surface-2: #F2F3F3; --ink: #14181C; --ink-2: #4B4F55;
     --muted: #7C8086; --hairline: #DCDFDE; --ring: rgba(20,24,28,0.10);
     --accent: #C98A04; --accent-ink: #14181C;
-    --flag-energy: #C8102E; --flag-telecom: #E06B22; --flag-water: #0072B5; --flag-other: #8A8E92; --flag-none: #B7BBBE;
+    --flag-energy: #C8102E; --flag-telecom: #E06B22; --flag-waste: #0E8F7C; --flag-other: #8A8E92; --flag-none: #B7BBBE;
     --tier-strong: #1E7A3D; --tier-fit: #1F5590; --tier-marginal: #96631C; --tier-pass: #9CA0A6;
     --shadow: 0 1px 2px rgba(20,24,28,0.06), 0 10px 28px -14px rgba(20,24,28,0.22);
     color-scheme: light;
@@ -114,7 +114,7 @@
   .locate-flag .pennant { width: 11px; height: 8px; margin-left: -1px; margin-top: 1px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
   .flag-energy .pennant { background: var(--flag-energy); }
   .flag-telecom .pennant { background: var(--flag-telecom); }
-  .flag-water .pennant { background: var(--flag-water); }
+  .flag-waste .pennant { background: var(--flag-waste); }
   .flag-other .pennant { background: var(--flag-other); }
   .flag-none .pole { background: var(--hairline); }
 
@@ -165,7 +165,7 @@
   .bar-fill { height: 100%; border-radius: 3px; }
   .bar-fill.flag-fill-energy { background: var(--flag-energy); }
   .bar-fill.flag-fill-telecom { background: var(--flag-telecom); }
-  .bar-fill.flag-fill-water { background: var(--flag-water); }
+  .bar-fill.flag-fill-waste { background: var(--flag-waste); }
   .bar-fill.flag-fill-other { background: var(--flag-other); }
   .bar-fill.flag-fill-none { background: var(--flag-none); }
 
@@ -265,10 +265,10 @@
         <div class="legend-top"><span class="locate-flag flag-telecom" title="Communications"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Communications</div><div class="legend-count">1</div></div>
         <div class="bar-track"><div class="bar-fill flag-fill-telecom" style="width:100%"></div></div>
       </div><div class="legend-row">
-        <div class="legend-top"><span class="locate-flag flag-water" title="Potable Water"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Potable Water</div><div class="legend-count">0</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-water" style="width:0%"></div></div>
+        <div class="legend-top"><span class="locate-flag flag-waste" title="Waste Management"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Waste Management</div><div class="legend-count">0</div></div>
+        <div class="bar-track"><div class="bar-fill flag-fill-waste" style="width:0%"></div></div>
       </div><div class="legend-row">
-        <div class="legend-top"><span class="locate-flag flag-other" title="Unmarked (Other / Transportation)"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Unmarked (Other / Transportation)</div><div class="legend-count">0</div></div>
+        <div class="legend-top"><span class="locate-flag flag-other" title="Unmarked (Water / Transportation / Other)"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Unmarked (Water / Transportation / Other)</div><div class="legend-count">0</div></div>
         <div class="bar-track"><div class="bar-fill flag-fill-other" style="width:0%"></div></div>
       </div><div class="legend-row">
         <div class="legend-top"><span class="locate-flag flag-none" title="Outside XIP&#39;s Right-of-Way (Consumer)"><span class="pole"></span></span><div class="legend-label">Outside XIP&#39;s Right-of-Way (Consumer)</div><div class="legend-count">1</div></div>
@@ -294,8 +294,8 @@
 
 <script>
   const DEALS = [{"id":"DF-00001","dateReceived":"2026-07-17","subject":"Fwd: M&A Opportunity: Premier Electrical Contractor & Smart Home Integrator","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Project \"Voltaic\" (Electrical Contractor & Smart Home Integrator)","endMarket":"Consumer-Facing (Residential)","geography":"South Atlantic (DC, FL, GA, NC, SC, VA, WV)","ebitda":"$2.5M (2024) - $3.1M (2027E)","revenue":"$10.6M (2024) - $12.1M (2027E)","ebitdaMargin":"~24-26%","askingPrice":"Unknown","businessModel":"Mixed","managementQuality":"Unknown","peOwned":"Unknown","brokerPlatform":"Axial Networks","processNotes":"NDA available to eSign; CIM instantly available","fitScore":35,"fitTier":"Pass","aiRationale":"Serves luxury homebuilders/homeowners in high-end residential market -- consumer-facing end-market, hard-disqualified despite strong margins and in-range revenue growth. Sourced via Axial broker network.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUoiAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"none"},{"id":"DF-00002","dateReceived":"2026-07-17","subject":"Fwd: CF Rich Communications Infrastructure Contractor","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"CF Rich Communications Infrastructure Contractor","endMarket":"Telecommunications Infrastructure","geography":"Mid-Atlantic Region","ebitda":"$3.65M (Cash Flow, asking-price basis)","revenue":"$12.75M","ebitdaMargin":"~29%","askingPrice":"$14,940,000","businessModel":"Capex-Heavy Construction","managementQuality":"Partial (existing management staying post-sale)","peOwned":"No (owner-operated, seller financing offered)","brokerPlatform":"DealStream (AI-sourced listing)","processNotes":"Seller financing offered; management will stay","fitScore":63,"fitTier":"Fit","aiRationale":"Telecom/communications infrastructure services fit the end-market well; EBITDA just under the $5-10M sweet spot with strong ~29% margin, but classified as heavy construction and sourced via a broad marketplace listing (DealStream), both of which weigh the score down from Strong Fit.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"telecom"}];
-  const FLAG_LABEL = {"energy":"Electric / Energy","telecom":"Communications","water":"Potable Water","other":"Unmarked (Other / Transportation)","none":"Outside XIP's Right-of-Way (Consumer)"};
-  document.getElementById('refreshed-at').textContent = 'Refreshed ' + new Date("2026-08-03T18:36:14.382Z").toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  const FLAG_LABEL = {"energy":"Electric / Energy","telecom":"Communications","waste":"Waste Management","other":"Unmarked (Water / Transportation / Other)","none":"Outside XIP's Right-of-Way (Consumer)"};
+  document.getElementById('refreshed-at').textContent = 'Refreshed ' + new Date("2026-08-04T16:04:12.123Z").toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
   const tierClass = (t) => 'stamp-' + String(t).toLowerCase().replace(/\s+/g, '-');
   const tierGlyph = (t) => t === 'Strong Fit' ? '&#10003;' : t === 'Pass' ? '&#10005;' : '&#9679;';
