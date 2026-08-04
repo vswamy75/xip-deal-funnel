@@ -72,6 +72,7 @@
 
   a { color: inherit; }
   *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
   header.top {
     display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px;
@@ -91,18 +92,24 @@
   .kpi .k-label { font-size: 10px; color: var(--muted); margin-bottom: 8px; }
   .kpi .k-value { font-size: 28px; font-weight: 700; line-height: 1; }
   .kpi .k-value.accent { color: var(--tier-strong); }
+  .k-delta { margin-top: 6px; font-size: 10.5px; font-weight: 700; }
+  .k-delta.up { color: var(--tier-strong); }
+  .k-delta.down { color: var(--flag-energy); }
+  .k-delta.flat { color: var(--muted); }
 
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
   .panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; box-shadow: var(--shadow); padding: 16px 18px; }
   .panel + .panel { margin-top: 18px; }
-  .panel h2 { font-size: 10.5px; color: var(--muted); margin: 0 0 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+  .panel h2 { position: relative; font-size: 10.5px; color: var(--muted); margin: 0 0 16px; padding-bottom: 8px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+  .panel h2::after { content: ""; position: absolute; left: 0; bottom: 0; width: 28px; height: 2px; background: var(--accent); }
 
   .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
   .search-box { flex: 1 1 200px; min-width: 160px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 4px; padding: 9px 12px; font-size: 13.5px; color: var(--ink); }
   .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { border: 1px solid var(--hairline); background: var(--surface-2); color: var(--ink-2); font-size: 11.5px; padding: 6px 12px; border-radius: 3px; cursor: pointer; user-select: none; }
+  .chip { font: inherit; appearance: none; -webkit-appearance: none; border: 1px solid var(--hairline); background: var(--surface-2); color: var(--ink-2); font-size: 11.5px; padding: 8px 14px; min-height: 32px; border-radius: 3px; cursor: pointer; user-select: none; }
+  .chip::-moz-focus-inner { border: 0; }
   .chip:hover { border-color: var(--accent); }
   .chip.active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
 
@@ -119,11 +126,18 @@
   .flag-none .pole { background: var(--hairline); }
 
   table.ledger { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.ledger thead th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; padding: 8px 10px; border-bottom: 2px solid var(--ink); cursor: pointer; white-space: nowrap; }
-  table.ledger thead th.sorted::after { content: " \2193"; }
-  table.ledger thead th.sorted.asc::after { content: " \2191"; }
+  table.ledger thead th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; padding: 8px 10px; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+  table.ledger thead .th-sort {
+    all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;
+    font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
+  }
+  table.ledger thead .th-sort:hover { color: var(--ink); }
+  table.ledger thead th[aria-sort="descending"] .th-sort::after { content: " \2193"; }
+  table.ledger thead th[aria-sort="ascending"] .th-sort::after { content: " \2191"; }
   table.ledger tbody tr { cursor: pointer; }
-  table.ledger tbody tr:hover td { background: var(--surface-2); }
+  table.ledger tbody tr:hover td, table.ledger tbody tr:focus-visible td { background: var(--surface-2); }
+  table.ledger tbody tr:hover td:first-child, table.ledger tbody tr:focus-visible td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  table.ledger tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   table.ledger td { padding: 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
   table.ledger td.num { text-align: right; }
   .company-cell { display: flex; align-items: flex-start; }
@@ -168,10 +182,34 @@
   .bar-fill.flag-fill-waste { background: var(--flag-waste); }
   .bar-fill.flag-fill-other { background: var(--flag-other); }
   .bar-fill.flag-fill-none { background: var(--flag-none); }
+  .bar-fill.source-fill { background: var(--accent); }
 
-  .source-tag { display: flex; justify-content: space-between; font-size: 12.5px; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
-  .source-tag:last-child { border-bottom: none; }
-  .source-count { font-weight: 700; color: var(--ink-2); font-family: "Cascadia Code", "Consolas", monospace; }
+  /* Deal Quality Funnel */
+  .funnel-panel { margin-bottom: 26px; }
+  .funnel-sub { font-size: 11.5px; color: var(--muted); margin: -10px 0 14px; }
+  .funnel-chart { display: flex; flex-direction: column; gap: 2px; }
+  .funnel-cap {
+    height: 44px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 4px 4px 0 0;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .funnel-cap-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+  .funnel-cap-count { font-size: 18px; font-weight: 700; }
+  .funnel-seg { position: relative; height: 64px; }
+  .funnel-seg-shape { position: absolute; inset: 0; }
+  .funnel-seg-marginal .funnel-seg-shape { background: var(--tier-marginal); }
+  .funnel-seg-fit .funnel-seg-shape { background: var(--tier-fit); }
+  .funnel-seg-strong .funnel-seg-shape { background: var(--tier-strong); }
+  .funnel-label { position: relative; z-index: 1; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .funnel-label-pill {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 999px; padding: 6px 16px; box-shadow: var(--shadow); font-size: 12.5px; color: var(--ink); white-space: nowrap;
+  }
+  .funnel-label-pill b { font-size: 15px; font-weight: 700; }
+  .funnel-label-pill small { color: var(--muted); font-weight: 600; }
+  .funnel-drops { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+  .funnel-drop { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+  .funnel-drop .mono { color: var(--muted); font-weight: 700; }
+  .funnel-empty { padding: 24px; text-align: center; color: var(--muted); font-style: italic; font-size: 13px; }
 
   /* Detail drawer */
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.18s; z-index: 40; }
@@ -205,17 +243,43 @@
 
 <header class="top">
   <div>
+    <div class="ticket-no mono">TICKET LOG &middot; XIP PRINCIPAL INVESTING</div>
     <h1 class="stencil">XIP Deal Funnel</h1>
   </div>
   <div class="refreshed mono" id="refreshed-at"></div>
 </header>
 
 <div class="kpi-row">
-  <div class="kpi"><div class="k-label stencil">Screened</div><div class="k-value mono">2</div></div>
-  <div class="kpi"><div class="k-label stencil">New / 7 Days</div><div class="k-value mono">0</div></div>
+  <div class="kpi"><div class="k-label stencil">Screened</div><div class="k-value mono">9</div></div>
+  <div class="kpi"><div class="k-label stencil">New / 7 Days</div><div class="k-value mono">7</div><div class="k-delta up">+7 vs prior wk</div></div>
   <div class="kpi"><div class="k-label stencil">Strong Fit</div><div class="k-value mono accent">0</div></div>
   <div class="kpi"><div class="k-label stencil">Fit</div><div class="k-value mono">1</div></div>
-  <div class="kpi"><div class="k-label stencil">Needs Review</div><div class="k-value mono">1</div></div>
+  <div class="kpi"><div class="k-label stencil">Needs Review</div><div class="k-value mono">4</div></div>
+</div>
+
+<div class="panel funnel-panel">
+  <h2>Deal Quality Funnel</h2>
+  <div class="funnel-sub">Stage-1 survivors, filtered by minimum qualifying tier</div>
+  <div class="funnel-chart">
+      <div class="funnel-cap"><span class="funnel-cap-label">Screened</span><span class="funnel-cap-count mono">9</span></div>
+      <div class="funnel-seg funnel-seg-marginal">
+        <div class="funnel-seg-shape" style="clip-path:polygon(0.00% 0%, 100.00% 0%, 72.22% 100%, 27.78% 100%)" aria-hidden="true"></div>
+        <div class="funnel-label"><span class="funnel-label-pill">At Least Marginal <b class="mono">4</b><small>44%</small></span></div>
+      </div>
+      <div class="funnel-seg funnel-seg-fit">
+        <div class="funnel-seg-shape" style="clip-path:polygon(27.78% 0%, 72.22% 0%, 55.56% 100%, 44.44% 100%)" aria-hidden="true"></div>
+        <div class="funnel-label"><span class="funnel-label-pill">At Least Fit <b class="mono">1</b><small>11%</small></span></div>
+      </div>
+      <div class="funnel-seg funnel-seg-strong">
+        <div class="funnel-seg-shape" style="clip-path:polygon(44.44% 0%, 55.56% 0%, 50.00% 100%, 50.00% 100%)" aria-hidden="true"></div>
+        <div class="funnel-label"><span class="funnel-label-pill">Strong Fit <b class="mono">0</b><small>0%</small></span></div>
+      </div>
+    </div>
+    <div class="funnel-drops">
+      <div class="funnel-drop"><span>Pass (didn&rsquo;t clear gate)</span><span class="mono">5</span></div>
+      <div class="funnel-drop"><span>Capped at Marginal</span><span class="mono">3</span></div>
+      <div class="funnel-drop"><span>Capped at Fit</span><span class="mono">1</span></div>
+    </div>
 </div>
 
 <div class="layout">
@@ -223,25 +287,26 @@
     <div class="panel">
       <h2>Deal Ledger</h2>
       <div class="toolbar">
+        <label class="visually-hidden" for="search">Search deals</label>
         <input class="search-box" id="search" type="text" placeholder="Search company, subject, end-market&hellip;" />
-        <div class="chip-row" id="tier-filters">
-          <div class="chip active" data-tier="all">All</div>
-          <div class="chip" data-tier="Strong Fit">Strong Fit</div>
-          <div class="chip" data-tier="Fit">Fit</div>
-          <div class="chip" data-tier="Marginal">Marginal</div>
-          <div class="chip" data-tier="Pass">Pass</div>
+        <div class="chip-row" id="tier-filters" role="group" aria-label="Filter by fit tier">
+          <button type="button" class="chip active" data-tier="all" aria-pressed="true">All</button>
+          <button type="button" class="chip" data-tier="Strong Fit" aria-pressed="false">Strong Fit</button>
+          <button type="button" class="chip" data-tier="Fit" aria-pressed="false">Fit</button>
+          <button type="button" class="chip" data-tier="Marginal" aria-pressed="false">Marginal</button>
+          <button type="button" class="chip" data-tier="Pass" aria-pressed="false">Pass</button>
         </div>
       </div>
       <div style="overflow-x:auto;">
         <table class="ledger" id="ledger">
           <thead>
             <tr>
-              <th data-key="dateReceived">Received</th>
-              <th data-key="targetCompany">Target</th>
-              <th data-key="endMarket">Locate</th>
-              <th data-key="sourceQuality">Source</th>
-              <th data-key="fitTier">Tier</th>
-              <th data-key="fitScore" class="sorted">Score</th>
+              <th><button type="button" class="th-sort" data-key="dateReceived">Received</button></th>
+              <th><button type="button" class="th-sort" data-key="targetCompany">Target</button></th>
+              <th><button type="button" class="th-sort" data-key="endMarket">Locate</button></th>
+              <th><button type="button" class="th-sort" data-key="sourceQuality">Source</button></th>
+              <th><button type="button" class="th-sort" data-key="fitTier">Tier</button></th>
+              <th aria-sort="descending"><button type="button" class="th-sort" data-key="fitScore">Score</button></th>
             </tr>
           </thead>
           <tbody id="ledger-body"></tbody>
@@ -253,31 +318,43 @@
   <div class="side-col">
     <div class="panel">
       <h2>By Fit Tier</h2>
-      <div class="tier-composition-bar"><div class="tier-seg tier-strong-fit" style="width:0%" title="Strong Fit: 0"></div><div class="tier-seg tier-fit" style="width:50%" title="Fit: 1"></div><div class="tier-seg tier-marginal" style="width:0%" title="Marginal: 0"></div><div class="tier-seg tier-pass" style="width:50%" title="Pass: 1"></div></div>
-      <div class="tier-legend-item"><span class="stamp stamp-strong-fit"><span class="stamp-glyph">&#10003;</span>Strong Fit<span class="stamp-score"></span></span><span class="tier-legend-count">0</span></div><div class="tier-legend-item"><span class="stamp stamp-fit"><span class="stamp-glyph">&#9679;</span>Fit<span class="stamp-score"></span></span><span class="tier-legend-count">1</span></div><div class="tier-legend-item"><span class="stamp stamp-marginal"><span class="stamp-glyph">&#9679;</span>Marginal<span class="stamp-score"></span></span><span class="tier-legend-count">0</span></div><div class="tier-legend-item"><span class="stamp stamp-pass"><span class="stamp-glyph">&#10005;</span>Pass<span class="stamp-score"></span></span><span class="tier-legend-count">1</span></div>
+      <div class="tier-composition-bar" aria-hidden="true"><div class="tier-seg tier-strong-fit" style="width:0%" title="Strong Fit: 0"></div><div class="tier-seg tier-fit" style="width:11.11111111111111%" title="Fit: 1"></div><div class="tier-seg tier-marginal" style="width:33.33333333333333%" title="Marginal: 3"></div><div class="tier-seg tier-pass" style="width:55.55555555555556%" title="Pass: 5"></div></div>
+      <div class="tier-legend-item"><span class="stamp stamp-strong-fit"><span class="stamp-glyph">&#10003;</span>Strong Fit<span class="stamp-score"></span></span><span class="tier-legend-count">0</span></div><div class="tier-legend-item"><span class="stamp stamp-fit"><span class="stamp-glyph">&#9679;</span>Fit<span class="stamp-score"></span></span><span class="tier-legend-count">1</span></div><div class="tier-legend-item"><span class="stamp stamp-marginal"><span class="stamp-glyph">&#9679;</span>Marginal<span class="stamp-score"></span></span><span class="tier-legend-count">3</span></div><div class="tier-legend-item"><span class="stamp stamp-pass"><span class="stamp-glyph">&#10005;</span>Pass<span class="stamp-score"></span></span><span class="tier-legend-count">5</span></div>
     </div>
     <div class="panel">
       <h2>Utility Locate Legend</h2>
       <div class="legend-row">
-        <div class="legend-top"><span class="locate-flag flag-energy" title="Electric / Energy"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Electric / Energy</div><div class="legend-count">0</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-energy" style="width:0%"></div></div>
+        <div class="legend-top"><span class="locate-flag flag-energy" title="Electric / Energy"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Electric / Energy</div><div class="legend-count">1</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill flag-fill-energy" style="width:25%"></div></div>
       </div><div class="legend-row">
         <div class="legend-top"><span class="locate-flag flag-telecom" title="Communications"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Communications</div><div class="legend-count">1</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-telecom" style="width:100%"></div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill flag-fill-telecom" style="width:25%"></div></div>
       </div><div class="legend-row">
         <div class="legend-top"><span class="locate-flag flag-waste" title="Waste Management"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Waste Management</div><div class="legend-count">0</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-waste" style="width:0%"></div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill flag-fill-waste" style="width:0%"></div></div>
       </div><div class="legend-row">
-        <div class="legend-top"><span class="locate-flag flag-other" title="Unmarked (Water / Transportation / Other)"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Unmarked (Water / Transportation / Other)</div><div class="legend-count">0</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-other" style="width:0%"></div></div>
+        <div class="legend-top"><span class="locate-flag flag-other" title="Unmarked (Water / Transportation / Other)"><span class="pole"></span><span class="pennant"></span></span><div class="legend-label">Unmarked (Water / Transportation / Other)</div><div class="legend-count">4</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill flag-fill-other" style="width:100%"></div></div>
       </div><div class="legend-row">
-        <div class="legend-top"><span class="locate-flag flag-none" title="Outside XIP&#39;s Right-of-Way (Consumer)"><span class="pole"></span></span><div class="legend-label">Outside XIP&#39;s Right-of-Way (Consumer)</div><div class="legend-count">1</div></div>
-        <div class="bar-track"><div class="bar-fill flag-fill-none" style="width:100%"></div></div>
+        <div class="legend-top"><span class="locate-flag flag-none" title="Outside XIP&#39;s Right-of-Way (Consumer)"><span class="pole"></span></span><div class="legend-label">Outside XIP&#39;s Right-of-Way (Consumer)</div><div class="legend-count">3</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill flag-fill-none" style="width:75%"></div></div>
       </div>
     </div>
     <div class="panel">
       <h2>By Deal Source</h2>
-      <div class="source-tag"><span>Off-market</span><span class="source-count">0</span></div><div class="source-tag"><span>Bulge-bracket/Mid-market Bank</span><span class="source-count">0</span></div><div class="source-tag"><span>Business Broker</span><span class="source-count">2</span></div><div class="source-tag"><span>Unknown</span><span class="source-count">0</span></div>
+      <div class="legend-row">
+        <div class="legend-top"><div class="legend-label">Off-market</div><div class="legend-count">0</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill source-fill" style="width:0%"></div></div>
+      </div><div class="legend-row">
+        <div class="legend-top"><div class="legend-label">Bulge-bracket/Mid-market Bank</div><div class="legend-count">0</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill source-fill" style="width:0%"></div></div>
+      </div><div class="legend-row">
+        <div class="legend-top"><div class="legend-label">Business Broker</div><div class="legend-count">7</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill source-fill" style="width:100%"></div></div>
+      </div><div class="legend-row">
+        <div class="legend-top"><div class="legend-label">Unknown</div><div class="legend-count">0</div></div>
+        <div class="bar-track" aria-hidden="true"><div class="bar-fill source-fill" style="width:0%"></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -287,15 +364,15 @@
 </footer>
 
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer">
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Deal details" aria-hidden="true">
   <button class="drawer-close" id="drawer-close">Close</button>
   <div id="drawer-content"></div>
 </aside>
 
 <script>
-  const DEALS = [{"id":"DF-00001","dateReceived":"2026-07-17","subject":"Fwd: M&A Opportunity: Premier Electrical Contractor & Smart Home Integrator","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Project \"Voltaic\" (Electrical Contractor & Smart Home Integrator)","endMarket":"Consumer-Facing (Residential)","geography":"South Atlantic (DC, FL, GA, NC, SC, VA, WV)","ebitda":"$2.5M (2024) - $3.1M (2027E)","revenue":"$10.6M (2024) - $12.1M (2027E)","ebitdaMargin":"~24-26%","askingPrice":"Unknown","businessModel":"Mixed","managementQuality":"Unknown","peOwned":"Unknown","brokerPlatform":"Axial Networks","processNotes":"NDA available to eSign; CIM instantly available","fitScore":35,"fitTier":"Pass","aiRationale":"Serves luxury homebuilders/homeowners in high-end residential market -- consumer-facing end-market, hard-disqualified despite strong margins and in-range revenue growth. Sourced via Axial broker network.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUoiAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"none"},{"id":"DF-00002","dateReceived":"2026-07-17","subject":"Fwd: CF Rich Communications Infrastructure Contractor","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"CF Rich Communications Infrastructure Contractor","endMarket":"Telecommunications Infrastructure","geography":"Mid-Atlantic Region","ebitda":"$3.65M (Cash Flow, asking-price basis)","revenue":"$12.75M","ebitdaMargin":"~29%","askingPrice":"$14,940,000","businessModel":"Capex-Heavy Construction","managementQuality":"Partial (existing management staying post-sale)","peOwned":"No (owner-operated, seller financing offered)","brokerPlatform":"DealStream (AI-sourced listing)","processNotes":"Seller financing offered; management will stay","fitScore":63,"fitTier":"Fit","aiRationale":"Telecom/communications infrastructure services fit the end-market well; EBITDA just under the $5-10M sweet spot with strong ~29% margin, but classified as heavy construction and sourced via a broad marketplace listing (DealStream), both of which weigh the score down from Strong Fit.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"telecom"}];
+  const DEALS = [{"id":"DF-00001","dateReceived":"2026-07-17","subject":"Fwd: M&A Opportunity: Premier Electrical Contractor & Smart Home Integrator","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Project \"Voltaic\" (Electrical Contractor & Smart Home Integrator)","endMarket":"Consumer-Facing (Residential)","geography":"South Atlantic (DC, FL, GA, NC, SC, VA, WV)","ebitda":"$2.5M (2024) - $3.1M (2027E)","revenue":"$10.6M (2024) - $12.1M (2027E)","ebitdaMargin":"~24-26%","askingPrice":"Unknown","businessModel":"Mixed","managementQuality":"Unknown","peOwned":"Unknown","brokerPlatform":"Axial Networks","processNotes":"NDA available to eSign; CIM instantly available","fitScore":35,"fitTier":"Pass","aiRationale":"Serves luxury homebuilders/homeowners in high-end residential market -- consumer-facing end-market, hard-disqualified despite strong margins and in-range revenue growth. Sourced via Axial broker network.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUoiAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"none"},{"id":"DF-00002","dateReceived":"2026-07-17","subject":"Fwd: CF Rich Communications Infrastructure Contractor","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"CF Rich Communications Infrastructure Contractor","endMarket":"Telecommunications Infrastructure","geography":"Mid-Atlantic Region","ebitda":"$3.65M (Cash Flow, asking-price basis)","revenue":"$12.75M","ebitdaMargin":"~29%","askingPrice":"$14,940,000","businessModel":"Capex-Heavy Construction","managementQuality":"Partial (existing management staying post-sale)","peOwned":"No (owner-operated, seller financing offered)","brokerPlatform":"DealStream (AI-sourced listing)","processNotes":"Seller financing offered; management will stay","fitScore":63,"fitTier":"Fit","aiRationale":"Telecom/communications infrastructure services fit the end-market well; EBITDA just under the $5-10M sweet spot with strong ~29% margin, but classified as heavy construction and sourced via a broad marketplace listing (DealStream), both of which weigh the score down from Strong Fit.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAARH84EAAB5X058TjLSTIlO61qPMaSdAACkdUokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"telecom"},{"id":"DF-00003","dateReceived":"2026-08-04","subject":"Fwd: New Listing 1916, Premier MA Insulation Contractor Powered by Utility Incentives","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Unknown (Listing 1916 - MA residential weatherization/insulation contractor)","endMarket":"Consumer-Facing (Residential)","geography":"Massachusetts","ebitda":"SDE $419,008 (2025)","revenue":"$3,618,503 (2025)","ebitdaMargin":"~11.6% (SDE basis)","askingPrice":"$1,195,000","businessModel":"Mixed","managementQuality":"Founder-only (owner + 13 employees, no stated systems)","peOwned":"Unknown","brokerPlatform":"Baystate Business Brokers","processNotes":"NDA required to view full details; utility-program-driven demand (~95% of work)","fitScore":19,"fitTier":"Pass","aiRationale":"Residential home-services business serving homeowners directly is consumer-facing and hard-disqualified despite a healthy margin and small, tidy deal size.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96mAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"none"},{"id":"DF-00004","dateReceived":"2026-08-04","subject":"Fwd: Vertically Integrated Logistics Platform","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Unknown (Vertically Integrated Trucking & Logistics Platform - entities incl. Right Truck Deal, Special Freight/EBE, Interstart, M&Y)","endMarket":"Transportation Infrastructure","geography":"Illinois (Oswego, IL HQ); national footprint","ebitda":"$18,000,000 (Cash Flow, 2025)","revenue":"$157,000,000 (2025 run-rate)","ebitdaMargin":"~11.5%","askingPrice":"$97,500,000 (headline listing) vs. $150,000,000 Enterprise Value at 10.1x Adj. EBITDA also stated -- inconsistent figures within the same listing","businessModel":"Mixed","managementQuality":"Partial (listing notes \"Management Will Stay\"; no further detail)","peOwned":"Unknown","brokerPlatform":"DealStream (AI-sourced listing, \"Search Genius\")","processNotes":"Seller financing offered; management will stay; relocatable; 800 trucks + 1,300 trailers fleet","fitScore":58,"fitTier":"Marginal","aiRationale":"Transportation infra fit is solid and EBITDA lands in the $10-20M band, but a broad AI-matched marketplace source and an internally inconsistent asking price/EV keep this below Fit tier.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96nAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"other"},{"id":"DF-00005","dateReceived":"2026-08-04","subject":"Fwd: Everingham & Kerr: Full-Service Contracting & Construction Management Company","sender":"jdunfee@infranextpartners.com","sourceQuality":"Bank","targetCompany":"Unknown (name withheld pending signed NDA - NJ full-service contracting & construction management company)","endMarket":"Other Infrastructure","geography":"New Jersey","ebitda":"$2,600,000 (normalized)","revenue":"$90,000,000","ebitdaMargin":"~2.9% (thin)","askingPrice":"Unknown","businessModel":"Capex-Heavy Construction","managementQuality":"Unknown","peOwned":"Unknown","brokerPlatform":"Everingham & Kerr, Inc.","processNotes":"Signed confidentiality agreement required before detailed selling memorandum is released","fitScore":30,"fitTier":"Pass","aiRationale":"General contracting/construction management is only loosely infra-adjacent, and a very thin ~2.9% EBITDA margin on $90M revenue keeps the financial profile weak despite a professional M&A advisory source.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96oAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"other"},{"id":"DF-00006","dateReceived":"2026-08-04","subject":"Fwd: Midwest Engineering Consulting Firm","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Unknown (50-year-old Midwest consulting engineering firm, name not disclosed)","endMarket":"Other Infrastructure","geography":"Western Midwest (IA, KS, MN, MO, NE, ND, SD)","ebitda":"$2,200,000 (Adj. EBITDA, FY2025)","revenue":"$7,900,000 (FY2025)","ebitdaMargin":"~27.8%","askingPrice":"Unknown","businessModel":"Service/O&M-Oriented","managementQuality":"Partial (leadership team in place to operate post-close)","peOwned":"Unknown","brokerPlatform":"Axial Networks","processNotes":"Axial NDA available; CIM instantly available; ~$20M backlog; owner retiring, seeking full sale","fitScore":42,"fitTier":"Marginal","aiRationale":"Engineering consulting to public/commercial infrastructure clients is a service-oriented business model with management continuity, but EBITDA sits just under the scoring range and sourcing is a broad marketplace listing.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96pAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"other"},{"id":"DF-00007","dateReceived":"2026-08-04","subject":"Fwd: Exclusive Electrical Services Platform in a Premier Luxury Market","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Unknown (name withheld - luxury residential electrical contractor)","endMarket":"Consumer-Facing (Luxury Residential)","geography":"Unknown","ebitda":"$2,703,417 (2025); $3,356,318 (2026 projected)","revenue":"$9,235,149 (2025); $10,589,055 (2026 projected)","ebitdaMargin":"~29-32%","askingPrice":"Unknown","businessModel":"Mixed","managementQuality":"Founder-only (100% inbound/referral leads, no formal marketing or stated systems)","peOwned":"Unknown","brokerPlatform":"SBB Capital Partners","processNotes":"40 employees plus in-house training program; real estate available separately; seller transition terms negotiable","fitScore":19,"fitTier":"Pass","aiRationale":"Luxury residential electrical/smart-home installer serving homeowners is consumer-facing and hard-disqualified regardless of its strong margin.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96qAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"none"},{"id":"DF-00008","dateReceived":"2026-08-04","subject":"Fwd: Power Generation And Industrial Park Platform","sender":"jdunfee@infranextpartners.com","sourceQuality":"Business Broker","targetCompany":"Unknown (distressed, fully permitted power plant + adjacent industrial park)","endMarket":"Energy Infrastructure","geography":"Mountain (AZ, CO, ID, MT, NV, UT, WY)","ebitda":"$1,600,000 (2025 actual); $2,800,000 (2027E) -- separately, a much larger ~$50M pro forma EBITDA figure is cited under a hypothetical full-buildout development scenario, not current actuals","revenue":"$12,500,000 (2025 actual); $23,800,000 (2027E)","ebitdaMargin":"~12.8% (2025 actual)","askingPrice":"Unknown (seeking $10M-$35M in growth/acquisition financing, recapitalization, or turnaround capital -- not a headline asking price/EV)","businessModel":"Capex-Heavy Construction","managementQuality":"Unknown (development sponsor seeking equity partners; no professional management team described)","peOwned":"Unknown","brokerPlatform":"Axial Networks","processNotes":"Axial NDA available; CIM instantly available; motivated seller; distressed asset requiring significant development capital","fitScore":44,"fitTier":"Marginal","aiRationale":"Energy infrastructure end-market scores well, but current actual EBITDA is small relative to the large pro forma buildout case, the business is pre-revenue-scale/development-stage (capex-heavy), and management is unstated.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96rAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"energy"},{"id":"DF-00009","dateReceived":"2026-08-04","subject":"Fwd: Acquisition Opportunity - Provider of Civil Engineering, Logistics and Plant Hire Services","sender":"jdunfee@infranextpartners.com","sourceQuality":"Bank","targetCompany":"Unknown (Ref: BN000050869 - civil engineering, logistics & plant hire provider, South Africa)","endMarket":"Other Infrastructure","geography":"South Africa","ebitda":"ZAR 29.4M / Adj. EBITDA (2025 actual) -- approx. USD equivalent not confirmed, roughly low-single-digit millions USD at typical ZAR/USD rates","revenue":"ZAR 100M (2025 actual)","ebitdaMargin":"~29.4%","askingPrice":"Unknown (full stake available; Teaser and CIM available on request)","businessModel":"Mixed","managementQuality":"Unknown","peOwned":"Unknown","brokerPlatform":"Benchmark International","processNotes":"Shareholders looking to exit; full stake available; Teaser/CIM available on request","fitScore":35,"fitTier":"Pass","aiRationale":"Civil engineering/plant-hire services support infrastructure clients with a strong stated margin, but the EBITDA figure (denominated in ZAR) converts to well below the target USD range, and management/systems detail is unstated.","attachments":"N","emailLink":"https://outlook.office365.com/owa/?ItemID=AAMkAGJiZDg3MTI0LWFhNzUtNGQzYS1hNWQzLWZlNDVmMmExMzRkNgBGAAAAAAD9u3VVtvqtSpWuAIjP80zoBwB5X058TjLSTIlO61qPMaSdAAAAAAEMAAB5X058TjLSTIlO61qPMaSdAADTu96sAAA%3D&exvsurl=1&viewmodel=ReadMessageItem","status":"New","flag":"other"}];
   const FLAG_LABEL = {"energy":"Electric / Energy","telecom":"Communications","waste":"Waste Management","other":"Unmarked (Water / Transportation / Other)","none":"Outside XIP's Right-of-Way (Consumer)"};
-  document.getElementById('refreshed-at').textContent = 'Refreshed ' + new Date("2026-08-04T16:23:04.816Z").toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  document.getElementById('refreshed-at').textContent = 'Refreshed ' + new Date("2026-08-04T16:33:00.819Z").toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
   const tierClass = (t) => 'stamp-' + String(t).toLowerCase().replace(/\s+/g, '-');
   const tierGlyph = (t) => t === 'Strong Fit' ? '&#10003;' : t === 'Pass' ? '&#10005;' : '&#9679;';
@@ -345,7 +422,7 @@
       return;
     }
     body.innerHTML = rows.map(d => `
-      <tr data-idx="${DEALS.indexOf(d)}">
+      <tr data-idx="${DEALS.indexOf(d)}" tabindex="0" role="button" aria-label="View details for ${escHtml(d.targetCompany || d.subject)}">
         <td class="mono">${escHtml(d.dateReceived)}</td>
         <td><div class="company-cell"><div class="txt"><div class="name">${escHtml(d.targetCompany || d.subject)}</div><div class="subj">${escHtml(d.subject)}</div></div></div></td>
         <td class="end-market-cell">${flagPin(d.flag)}${escHtml(d.endMarket)}</td>
@@ -356,11 +433,19 @@
     `).join('');
 
     body.querySelectorAll('tr[data-idx]').forEach(tr => {
-      tr.addEventListener('click', () => openDrawer(DEALS[Number(tr.dataset.idx)]));
+      tr.addEventListener('click', () => openDrawer(DEALS[Number(tr.dataset.idx)], tr));
+      tr.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDrawer(DEALS[Number(tr.dataset.idx)], tr);
+        }
+      });
     });
   }
 
-  function openDrawer(d) {
+  let lastFocusedTrigger = null;
+  function openDrawer(d, triggerEl) {
+    lastFocusedTrigger = triggerEl || document.activeElement;
     const content = document.getElementById('drawer-content');
     content.innerHTML = `
       <div class="drawer-flag">${flagPin(d.flag)}<span style="font-size:11.5px;color:var(--muted)">${escHtml(FLAG_LABEL[d.flag])}</span></div>
@@ -385,34 +470,48 @@
       <div class="rationale-box">${escHtml(d.aiRationale) || '<em>No rationale recorded.</em>'}</div>
       ${d.emailLink ? `<a class="email-link" href="${escHtml(d.emailLink)}" target="_blank" rel="noopener">Open Original Email</a>` : ''}
     `;
-    document.getElementById('drawer').classList.add('open');
+    const drawer = document.getElementById('drawer');
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
     document.getElementById('scrim').classList.add('open');
+    requestAnimationFrame(() => document.getElementById('drawer-close').focus());
   }
   function closeDrawer() {
-    document.getElementById('drawer').classList.remove('open');
+    const drawer = document.getElementById('drawer');
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
     document.getElementById('scrim').classList.remove('open');
+    if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') lastFocusedTrigger.focus();
   }
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
   document.getElementById('scrim').addEventListener('click', closeDrawer);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+  document.getElementById('drawer').addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const focusables = Array.from(document.getElementById('drawer').querySelectorAll('button, a[href]'));
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   document.getElementById('search').addEventListener('input', e => { state.query = e.target.value; render(); });
   document.getElementById('tier-filters').addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
-    document.querySelectorAll('#tier-filters .chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#tier-filters .chip').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
     chip.classList.add('active');
+    chip.setAttribute('aria-pressed', 'true');
     state.tier = chip.dataset.tier;
     render();
   });
-  document.querySelectorAll('table.ledger thead th[data-key]').forEach(th => {
-    th.addEventListener('click', () => {
-      const key = th.dataset.key;
+  document.querySelectorAll('table.ledger thead button.th-sort').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
       if (state.sortKey === key) { state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc'; }
       else { state.sortKey = key; state.sortDir = key === 'fitScore' ? 'desc' : 'asc'; }
-      document.querySelectorAll('table.ledger thead th').forEach(t => t.classList.remove('sorted', 'asc'));
-      th.classList.add('sorted');
-      if (state.sortDir === 'asc') th.classList.add('asc');
+      document.querySelectorAll('table.ledger thead th').forEach(t => t.removeAttribute('aria-sort'));
+      btn.closest('th').setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
       render();
     });
   });
