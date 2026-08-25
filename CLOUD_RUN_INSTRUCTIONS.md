@@ -64,8 +64,15 @@ Overwrite `data/state.json`'s `lastCheckedISO` with the current run time (UTC IS
 ```
 git add -A
 git commit -m "Auto-sync dashboard <current UTC timestamp>"
-git push origin main
+git push origin HEAD:main
 ```
+Use `HEAD:main`, not bare `main` — this environment's fresh clone starts in detached
+HEAD. `git push origin main` pushes the untouched local `main` ref (a silent no-op:
+exits 0, prints "Everything up-to-date", nothing reaches GitHub Pages) rather than the
+commit you just made on HEAD. This exact bug stranded ~2 days / 50 runs of commits
+before it was caught on 2026-08-25 — verify with `git log --oneline origin/main..HEAD`
+after pushing; it should be empty.
+
 If there's nothing to commit (identical content since last run), skip onward — that's
 fine. If the push fails (auth/credential issue), don't retry repeatedly — report it
 clearly so a human can re-authenticate the routine's git access.
