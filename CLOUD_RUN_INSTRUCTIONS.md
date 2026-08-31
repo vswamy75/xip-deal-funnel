@@ -85,3 +85,28 @@ One-line summary: emails scanned, how many passed Stage 1, how many new deals lo
 Do not write to SharePoint or OneDrive. Do not modify `rubric.md` unless explicitly asked
 to in this run's instructions. There is no Claude Artifact publish step in this cloud
 version — GitHub Pages (this repo's `index.html`) is the single live dashboard link.
+
+## Verified constraints (2026-08-31)
+
+Three things confirmed by testing; they save a lot of re-diagnosis.
+
+**The routine must be created in the claude.ai Routines UI.** A routine created
+programmatically from inside a Claude session inherits that session's tool allowlist,
+which contains no MCP connector tools. The fired session therefore has no Microsoft 365
+access and aborts in ~30s. Two were built this way and both failed, including on a real
+scheduled fire. See `ROUTINE_PROMPT.md` for the exact prompt, schedule, and settings.
+
+**`get_me` returns shruti.nayar@xipllc.com, not inbound@.** That is expected. The shared
+mailbox is reached solely through the `mailboxOwnerEmail` parameter (delegate access).
+An earlier note in `state.json` claimed the signed-in identity *was* inbound@ — it was
+wrong, and a run trusting it could wrongly conclude it was in the wrong mailbox.
+
+**Search query shape matters.** Date-bounded windows (both `afterDateTime` and
+`beforeDateTime`, <=12h) are fast and reliable. Open-ended or multi-day windows
+intermittently time out at 60s. A timeout is a performance problem, not an access
+denial — retry or split into bands. To distinguish a genuinely empty window from a
+failing tool, run the narrow positive control in `ROUTINE_PROMPT.md`.
+
+**How to tell a run worked:** a successful run always commits, even with zero new
+emails, because the dashboard Refreshed timestamp changes. No commit means it did not
+run — whatever its reported status. A sub-minute "succeeded" is an abort.
