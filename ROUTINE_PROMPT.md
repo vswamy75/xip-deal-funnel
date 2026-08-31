@@ -1,13 +1,54 @@
 # Hourly intake sync — routine setup
 
-The hourly sync must be created from the **claude.ai Routines UI**, not from inside a
-Claude session. Routines minted programmatically from a session inherit that session's
-tool allowlist, which carries no MCP connector tools — so the fired session has no
-Microsoft 365 access, hits the Step 0 check, and aborts in ~30s without doing anything.
+## The actual problem (verified 2026-08-31)
 
-Verified 2026-08-31: two such routines were created and both failed this way (one on a
-genuine scheduled fire at 17:18Z, 57s, no commit; one on a forced test at 17:45Z, 32s,
-no commit). A working run takes ~3 minutes and always produces a commit.
+The pipeline needs ONE execution context holding BOTH capabilities:
+
+- **A** — the Microsoft 365 connector, to read `inbound@xipllc.com`
+- **B** — git push access to `xip-nayar/xip-deal-funnel`
+
+Every context tried so far has exactly one of the two. That, not any bug in this repo,
+is why different surfaces report different levels of success:
+
+| Context | A: Outlook | B: push | Result |
+|---|---|---|---|
+| Interactive Claude Code session (w/ connectors) | yes | yes | works |
+| Routine minted *from* a Claude Code session | no | yes | aborts in 30-60s |
+| Routine minted from Cowork/chat (`cowork-remote` env) | yes | no | 10 min of real work, discarded |
+| The legacy hourly task (`:49` series) | yes | yes | works |
+
+Two traps that make this hard to see:
+
+- A routine's status reads **SUCCEEDED** when the session merely exits cleanly. It is
+  NOT a claim that the pipeline did anything. A sub-minute "succeeded" is an abort; a
+  10-minute "succeeded" with no commit is work thrown away.
+- The only trustworthy signal is the commit log. A real run ALWAYS commits, even with
+  zero new emails, because the dashboard Refreshed timestamp changes. **No commit means
+  it did not run**, whatever any status field or chat transcript says.
+
+## Getting a context with both capabilities
+
+Ranked. Option 1 introduces no new credentials — try it first.
+
+**Option 1 — Routines UI, bound to the Claude Code environment.** Create the routine
+from the claude.ai Routines UI, selecting the Claude Code environment that already has
+this repo (it holds B), and enabling the Microsoft 365 connector on it (adds A). Works
+only if that surface lets you pick both; check before assuming.
+
+**Option 2 — give the run its own git credential.** Keep the routine wherever the
+connector attaches (A), and add B explicitly: a fine-grained GitHub PAT scoped to
+`xip-nayar/xip-deal-funnel` with Contents: read+write, stored as a secret/env var in
+that environment. Then step 11 pushes with the token rather than relying on ambient
+credentials:
+
+```
+git push "https://x-access-token:${GITHUB_TOKEN}@github.com/xip-nayar/xip-deal-funnel.git" HEAD:main
+```
+
+Rotate the token on the usual schedule; it is the only long-lived secret here.
+
+**Do not** retire the legacy `:49` task until a replacement has produced its own commit.
+It is currently the only working automation.
 
 ## Settings
 
