@@ -1,4 +1,4 @@
 {
-  "lastCheckedISO": "2026-09-05T11:48:45Z",
-  "notes": "Run at 2026-09-05T11:48:45Z; searched inbound@xipllc.com (get_me now returns inbound@xipllc.com directly, no mailboxOwnerEmail workaround needed). Searched 10:34:04Z -> 11:48:45Z (15-min buffer before prior checkpoint 10:49:04Z): 0 emails found; confirmed genuine via positive-control query for the known 2026-08-28T21:00-21:30Z BayState email (returned correctly). No Stage-1 candidates, no new rows. Dashboard regenerated to refresh the timestamp. Deal history unchanged: DF-00001..00032, 1 Strong Fit / 8 Fit / 8 Marginal / 15 Pass (see git history for full breakdown)."
+  "lastCheckedISO": "2026-09-05T12:48:38Z",
+  "notes": "Run at 2026-09-05T12:48:38Z; searched inbound@xipllc.com (get_me returns inbound@xipllc.com directly). Searched 11:33:45Z -> 12:48:38Z (15-min buffer before prior checkpoint 11:48:45Z): 0 emails found; confirmed genuine via positive-control query for the known 2026-08-28T21:00-21:30Z BayState email (returned correctly, 1 result). No Stage-1 candidates, no new rows. Dashboard regenerated to refresh the timestamp. Deal history unchanged: DF-00001..00032, 1 Strong Fit / 8 Fit / 8 Marginal / 15 Pass (see git history for full breakdown)."
 }
